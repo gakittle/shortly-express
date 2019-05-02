@@ -77,7 +77,6 @@ app.post('/signup', (req, res) => {
   const password = req.body.password;
   return models.Users.get({ username })
     .then(user => {
-      // console.log('this is the user', user);
       if (user) {
         throw user;
       }
@@ -96,6 +95,26 @@ app.post('/signup', (req, res) => {
 
 app.get('/signup', (req, res) => {
   res.render('signup');
+});
+
+app.post('/login', (req, res) => {
+  const username = req.body.username;
+  const password = req.body.password;
+  return models.Users.get({ username })
+    .then(user => {
+      if (!user || !models.Users.compare(password, user.password, user.salt)) {
+        throw user;
+      }
+      return res.redirect('/');
+    })
+    .catch(user => {
+      res.redirect('/login');
+    })
+    .error(err => res.status(500).send(err));
+});
+
+app.get('/login', (req, res) => {
+  res.render('login');
 });
 
 /************************************************************/
